@@ -1,0 +1,116 @@
+{
+  ".svelte-kit/generated/client-optimized/app.js": {
+    "file": "_app/immutable/entry/app.Dle91Kmg.js",
+    "name": "entry/app",
+    "src": ".svelte-kit/generated/client-optimized/app.js",
+    "isEntry": true,
+    "imports": [
+      "_0I7qTmtZ.js",
+      "_grwyZHeQ.js",
+      "_la739E4B.js",
+      "_DsnmJJEf.js"
+    ],
+    "dynamicImports": [
+      ".svelte-kit/generated/client-optimized/nodes/0.js",
+      ".svelte-kit/generated/client-optimized/nodes/1.js",
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/0.js": {
+    "file": "_app/immutable/nodes/0.r-eE-_Cb.js",
+    "name": "nodes/0",
+    "src": ".svelte-kit/generated/client-optimized/nodes/0.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_DsnmJJEf.js",
+      "_grwyZHeQ.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/1.js": {
+    "file": "_app/immutable/nodes/1.D0n-SL81.js",
+    "name": "nodes/1",
+    "src": ".svelte-kit/generated/client-optimized/nodes/1.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_DsnmJJEf.js",
+      "_BFbF0kSw.js",
+      "_grwyZHeQ.js",
+      "_la739E4B.js",
+      "_CgjsrV-1.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/2.js": {
+    "file": "_app/immutable/nodes/2.BIyt1QUu.js",
+    "name": "nodes/2",
+    "src": ".svelte-kit/generated/client-optimized/nodes/2.js",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_0I7qTmtZ.js",
+      "_DsnmJJEf.js",
+      "_BFbF0kSw.js",
+      "_la739E4B.js",
+      "_grwyZHeQ.js"
+    ],
+    "dynamicImports": [
+      "node_modules/@googleworkspace/drive-picker-element/dist/index.iife.min.js"
+    ],
+    "css": [
+      "_app/immutable/assets/2.BrJzvI2l.css"
+    ]
+  },
+  "_0I7qTmtZ.js": {
+    "file": "_app/immutable/chunks/0I7qTmtZ.js",
+    "name": "preload-helper",
+    "imports": [
+      "_grwyZHeQ.js"
+    ]
+  },
+  "_BFbF0kSw.js": {
+    "file": "_app/immutable/chunks/BFbF0kSw.js",
+    "name": "legacy",
+    "imports": [
+      "_grwyZHeQ.js"
+    ]
+  },
+  "_CgjsrV-1.js": {
+    "file": "_app/immutable/chunks/CgjsrV-1.js",
+    "name": "entry",
+    "imports": [
+      "_la739E4B.js",
+      "_grwyZHeQ.js"
+    ]
+  },
+  "_DsnmJJEf.js": {
+    "file": "_app/immutable/chunks/DsnmJJEf.js",
+    "name": "disclose-version"
+  },
+  "_grwyZHeQ.js": {
+    "file": "_app/immutable/chunks/grwyZHeQ.js",
+    "name": "snippet"
+  },
+  "_la739E4B.js": {
+    "file": "_app/immutable/chunks/la739E4B.js",
+    "name": "index-client",
+    "imports": [
+      "_grwyZHeQ.js"
+    ]
+  },
+  "node_modules/@googleworkspace/drive-picker-element/dist/index.iife.min.js": {
+    "file": "_app/immutable/chunks/CX0hRp9o.js",
+    "name": "index.iife.min",
+    "src": "node_modules/@googleworkspace/drive-picker-element/dist/index.iife.min.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/@sveltejs/kit/src/runtime/client/entry.js": {
+    "file": "_app/immutable/entry/start.Cj5QUQN1.js",
+    "name": "entry/start",
+    "src": "node_modules/@sveltejs/kit/src/runtime/client/entry.js",
+    "isEntry": true,
+    "imports": [
+      "_CgjsrV-1.js"
+    ]
+  }
+}
