@@ -12,9 +12,9 @@ return {
 	_: {
 		client: {start:"_app/immutable/entry/start.C5y5gGlt.js",app:"_app/immutable/entry/app.Cyk19Ru7.js",imports:["_app/immutable/entry/start.C5y5gGlt.js","_app/immutable/chunks/BKwK9rqO.js","_app/immutable/chunks/la739E4B.js","_app/immutable/chunks/grwyZHeQ.js","_app/immutable/entry/app.Cyk19Ru7.js","_app/immutable/chunks/0I7qTmtZ.js","_app/immutable/chunks/grwyZHeQ.js","_app/immutable/chunks/la739E4B.js","_app/immutable/chunks/DsnmJJEf.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
-			__memo(() => import('./nodes/0.js')),
-			__memo(() => import('./nodes/1.js')),
-			__memo(() => import('./nodes/2.js'))
+			__memo(() => import('../output/server/nodes/0.js')),
+			__memo(() => import('../output/server/nodes/1.js')),
+			__memo(() => import('../output/server/nodes/2.js'))
 		],
 		routes: [
 			{
@@ -34,3 +34,7 @@ return {
 	}
 }
 })();
+
+export const prerendered = new Set([]);
+
+export const base_path = "";
