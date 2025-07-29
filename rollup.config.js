@@ -8,12 +8,12 @@ import commonjs from "rollup-plugin-commonjs";
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: "index.js",
+  input: "src/App.svelte",
   output: {
     sourcemap: true,
     format: "iife",
     name: "app",
-    file: "public/bundle.js",
+    file: "dist/bundle.js",
   },
   plugins: [
     svelte({
