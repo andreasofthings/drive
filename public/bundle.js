@@ -1,0 +1,477 @@
+var app = (function (discloseVersion, legacy, $) {
+  'use strict';
+
+  function _interopNamespaceDefault(e) {
+    var n = Object.create(null);
+    if (e) {
+      Object.keys(e).forEach(function (k) {
+        if (k !== 'default') {
+          var d = Object.getOwnPropertyDescriptor(e, k);
+          Object.defineProperty(n, k, d.get ? d : {
+            enumerable: true,
+            get: function () { return e[k]; }
+          });
+        }
+      });
+    }
+    n.default = e;
+    return Object.freeze(n);
+  }
+
+  var $__namespace = /*#__PURE__*/_interopNamespaceDefault($);
+
+  var __defProp = Object.defineProperty;
+  var __defProps = Object.defineProperties;
+  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  var __async = (__this, __arguments, generator) => {
+    return new Promise((resolve, reject) => {
+      var fulfilled = (value) => {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var rejected = (value) => {
+        try {
+          step(generator.throw(value));
+        } catch (e) {
+          reject(e);
+        }
+      };
+      var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+      step((generator = generator.apply(__this, __arguments)).next());
+    });
+  };
+
+  // src/utils.ts
+  var GAPI_URL = "https://apis.google.com/js/api.js";
+  var GSI_URL = "https://accounts.google.com/gsi/client";
+  function loadApi(api = "client:picker") {
+    return __async(this, null, function* () {
+      if (!window.gapi) {
+        yield injectScript(GAPI_URL);
+      }
+      yield new Promise((r) => {
+        window.gapi.load(api, r);
+      });
+      return window.google;
+    });
+  }
+  function requestAccessToken(tokenClientConfig) {
+    return __async(this, null, function* () {
+      var _a, _b;
+      if (!((_b = (_a = window.google) == null ? void 0 : _a.accounts) == null ? void 0 : _b.oauth2)) {
+        yield injectScript(GSI_URL);
+      }
+      return new Promise((resolve, reject) => {
+        const client = window.google.accounts.oauth2.initTokenClient(__spreadProps(__spreadValues({}, tokenClientConfig), {
+          callback: resolve,
+          error_callback: reject
+        }));
+        client.requestAccessToken();
+      });
+    });
+  }
+  function injectScript(src) {
+    return __async(this, null, function* () {
+      return new Promise((resolve, reject) => {
+        if (!document.querySelector(`script[src="${src}"]`)) {
+          document.head.appendChild(
+            Object.assign(document.createElement("script"), {
+              src,
+              onload: resolve,
+              onerror: reject
+            })
+          );
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+  function getNumberAttribute(element, name) {
+    const value = element.getAttribute(name);
+    return value ? Number(value) : null;
+  }
+  var BoolAttrWithDefault = /* @__PURE__ */ ((BoolAttrWithDefault2) => {
+    BoolAttrWithDefault2[BoolAttrWithDefault2["FALSE"] = 0] = "FALSE";
+    BoolAttrWithDefault2[BoolAttrWithDefault2["TRUE"] = 1] = "TRUE";
+    BoolAttrWithDefault2[BoolAttrWithDefault2["DEFAULT"] = 2] = "DEFAULT";
+    return BoolAttrWithDefault2;
+  })(BoolAttrWithDefault || {});
+  function getBoolAttr(element, name) {
+    return element.hasAttribute(name);
+  }
+  function getBoolAttrWithDefault(element, name) {
+    var _a;
+    const attributeValue = (_a = element.getAttribute(name)) == null ? void 0 : _a.toUpperCase();
+    if (!attributeValue) {
+      return 2 /* DEFAULT */;
+    }
+    const value = BoolAttrWithDefault[attributeValue];
+    if (value !== void 0) {
+      return value;
+    }
+    throw new Error(
+      `Invalid value, "${attributeValue}", for attribute ${name}. Must be one of ${Object.keys(BoolAttrWithDefault).filter(Number.isNaN).join(", ")}`
+    );
+  }
+  function setBoolAttrWithDefault(name, element, setter, instance) {
+    const attr = getBoolAttrWithDefault(element, name);
+    if (attr === 2 /* DEFAULT */) {
+      return instance;
+    }
+    return setter.call(instance, attr === 1 /* TRUE */);
+  }
+
+  // src/drive-picker/drive-picker-element.ts
+  var DrivePickerElement = class extends HTMLElement {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "picker");
+      __publicField(this, "observer");
+      __publicField(this, "google");
+      __publicField(this, "loading");
+      __publicField(this, "debounceTimer");
+    }
+    static get observedAttributes() {
+      return [
+        "app-id",
+        "client-id",
+        "debounce-delay",
+        "developer-key",
+        "hide-title-bar",
+        "locale",
+        "max-items",
+        "mine-only",
+        "multiselect",
+        "nav-hidden",
+        "oauth-token",
+        "origin",
+        "relay-url",
+        "scope",
+        "title"
+      ];
+    }
+    /**
+     * The visibility of the picker.
+     */
+    get visible() {
+      var _a;
+      return Boolean((_a = this.picker) == null ? void 0 : _a.isVisible());
+    }
+    /**
+     * Controls the visibility of the picker after the picker dialog has been
+     * closed. If any of the attributes change, the picker will be rebuilt and
+     * the visibility will be reset.
+     */
+    set visible(value) {
+      var _a;
+      (_a = this.picker) == null ? void 0 : _a.setVisible(value);
+    }
+    get tokenClientConfig() {
+      var _a, _b, _c, _d;
+      const clientId = this.getAttribute("client-id");
+      const scope = (_a = this.getAttribute("scope")) != null ? _a : "https://www.googleapis.com/auth/drive.file";
+      if (!clientId || !scope) {
+        throw new Error("client-id and scope are required attributes");
+      }
+      return {
+        client_id: clientId,
+        hd: (_b = this.getAttribute("hd")) != null ? _b : void 0,
+        include_granted_scopes: Boolean(
+          this.getAttribute("include-granted-scope")
+        ),
+        login_hint: (_c = this.getAttribute("login-hint")) != null ? _c : void 0,
+        prompt: (_d = this.getAttribute("prompt")) != null ? _d : "",
+        scope
+      };
+    }
+    attributeChangedCallback() {
+      this.scheduleBuild();
+    }
+    scheduleBuild() {
+      var _a;
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = window.setTimeout(() => {
+        this.build();
+      }, (_a = getNumberAttribute(this, "debounce-delay")) != null ? _a : 0);
+    }
+    build() {
+      return __async(this, null, function* () {
+        var _a, _b;
+        (_a = this.picker) == null ? void 0 : _a.dispose();
+        yield this.loading;
+        if (!this.google) return;
+        let builder = new this.google.picker.PickerBuilder().setCallback(
+          (data) => {
+            this.callbackToDispatchEvent(data);
+          }
+        );
+        const appId = this.getAttribute("app-id");
+        if (appId !== null) builder = builder.setAppId(appId);
+        const developerKey = this.getAttribute("developer-key");
+        if (developerKey !== null) builder = builder.setDeveloperKey(developerKey);
+        const locale = this.getAttribute("locale");
+        if (locale !== null)
+          builder = builder.setLocale(locale);
+        const maxItems = getNumberAttribute(this, "max-items");
+        if (maxItems !== null) builder = builder.setMaxItems(maxItems);
+        const origin = this.getAttribute("origin");
+        if (origin !== null) builder = builder.setOrigin(origin);
+        const relayUrl = this.getAttribute("relay-url");
+        if (relayUrl !== null) builder = builder.setRelayUrl(relayUrl);
+        const title = this.getAttribute("title");
+        if (title !== null) builder = builder.setTitle(title);
+        setBoolAttrWithDefault(
+          "hide-title-bar",
+          this,
+          builder.hideTitleBar,
+          builder
+        );
+        const oauthToken = (_b = this.getAttribute("oauth-token")) != null ? _b : yield this.requestAccessToken();
+        if (!oauthToken) return;
+        builder = builder.setOAuthToken(oauthToken);
+        if (getBoolAttr(this, "multiselect")) {
+          builder = builder.enableFeature(
+            this.google.picker.Feature.MULTISELECT_ENABLED
+          );
+        }
+        if (getBoolAttr(this, "mine-only")) {
+          builder = builder.enableFeature(this.google.picker.Feature.MINE_ONLY);
+        }
+        if (getBoolAttr(this, "nav-hidden")) {
+          builder = builder.enableFeature(this.google.picker.Feature.NAV_HIDDEN);
+        }
+        for (const view of this.views) {
+          builder = builder.addView(view);
+        }
+        this.picker = builder.build();
+        this.picker.setVisible(true);
+      });
+    }
+    /**
+     * The `google.Picker.View` objects to display in the picker as defined by the slot elements.
+     */
+    get views() {
+      const views = nestedViews(this);
+      return views.length ? views : ["all"];
+    }
+    connectedCallback() {
+      return __async(this, null, function* () {
+        var _a;
+        this.loading = loadApi().then((google2) => {
+          this.google = google2;
+        });
+        this.observer = new MutationObserver((mutations) => {
+          const filteredMutations = mutations.filter(
+            (mutation) => mutation.type === "childList" || mutation.type === "attributes" && mutation.target !== this
+          );
+          if (filteredMutations.length) {
+            this.scheduleBuild();
+          }
+        });
+        (_a = this.observer) == null ? void 0 : _a.observe(this, {
+          childList: true,
+          subtree: true,
+          attributes: true
+        });
+      });
+    }
+    callbackToDispatchEvent(detail) {
+      let eventTypes;
+      switch (detail.action) {
+        case google.picker.Action.CANCEL:
+          eventTypes = ["picker:canceled", "picker-canceled"];
+          break;
+        case google.picker.Action.PICKED:
+          eventTypes = ["picker:picked", "picker-picked"];
+          break;
+        case google.picker.Action.ERROR:
+          eventTypes = ["picker:error", "picker-error"];
+          break;
+        default:
+          return;
+      }
+      for (const eventType of eventTypes) {
+        this.dispatchEvent(
+          new CustomEvent(eventType, {
+            detail
+          })
+        );
+      }
+    }
+    requestAccessToken() {
+      return __async(this, null, function* () {
+        return requestAccessToken(this.tokenClientConfig).then((response) => {
+          const { access_token: token } = response;
+          if (!token) {
+            this.dispatchEvent(
+              new CustomEvent("picker:oauth:error", {
+                detail: response
+              })
+            );
+            this.dispatchEvent(
+              new CustomEvent("picker-oauth-error", {
+                detail: response
+              })
+            );
+            return void 0;
+          }
+          this.dispatchEvent(
+            new CustomEvent("picker:authenticated", { detail: { token } })
+          );
+          this.dispatchEvent(
+            new CustomEvent("picker-oauth-response", { detail: response })
+          );
+          this.dispatchEvent(
+            new CustomEvent("picker:oauth:response", { detail: response })
+          );
+          this.dispatchEvent(
+            new CustomEvent("picker-oauth-response", { detail: response })
+          );
+          return token;
+        }).catch((error) => {
+          this.dispatchEvent(
+            new CustomEvent("picker:oauth:error", {
+              detail: error
+            })
+          );
+          this.dispatchEvent(
+            new CustomEvent("picker-oauth-error", {
+              detail: error
+            })
+          );
+          return void 0;
+        });
+      });
+    }
+    disconnectedCallback() {
+      var _a;
+      (_a = this.picker) == null ? void 0 : _a.dispose();
+    }
+  };
+  function isView(obj) {
+    return "view" in obj && obj.view instanceof window.google.picker.View;
+  }
+  function filterElementsToViewOrViewGroup(elements) {
+    return elements.filter((element) => isView(element)).map((element) => element.view);
+  }
+  function nestedViews(target, selector = "*") {
+    return filterElementsToViewOrViewGroup(
+      Array.from(target.querySelectorAll(selector))
+    );
+  }
+
+  // src/drive-picker/drive-picker-docs-view-element.ts
+  var DrivePickerDocsViewElement = class extends HTMLElement {
+    static get observedAttributes() {
+      return [
+        "enable-drives",
+        "file-ids",
+        "include-folders",
+        "mime-types",
+        "mode",
+        "owned-by-me",
+        "parent",
+        "query",
+        "select-folder-enabled",
+        "starred",
+        "view-id"
+      ];
+    }
+    /**
+     * Gets the Google Drive Picker view based on the current attribute values.
+     * @returns {google.picker.DocsView} The Google Drive picker view.
+     */
+    get view() {
+      const view = new window.google.picker.DocsView(this.viewId);
+      setBoolAttrWithDefault("enable-drives", this, view.setEnableDrives, view);
+      setBoolAttrWithDefault(
+        "include-folders",
+        this,
+        view.setIncludeFolders,
+        view
+      );
+      setBoolAttrWithDefault("owned-by-me", this, view.setOwnedByMe, view);
+      setBoolAttrWithDefault(
+        "select-folder-enabled",
+        this,
+        view.setSelectFolderEnabled,
+        view
+      );
+      setBoolAttrWithDefault("starred", this, view.setStarred, view);
+      const mimetypes = this.getAttribute("mime-types");
+      if (mimetypes !== null) view.setMimeTypes(mimetypes);
+      const fileIds = this.getAttribute("file-ids");
+      if (fileIds !== null) view.setFileIds(fileIds);
+      const mode = this.getAttribute("mode");
+      if (mode)
+        view.setMode(
+          google.picker.DocsViewMode[mode]
+        );
+      const parent = this.getAttribute("parent");
+      if (parent !== null) view.setParent(parent);
+      const query = this.getAttribute("query");
+      if (query !== null) view.setQuery(query);
+      return view;
+    }
+    get viewId() {
+      const viewId = this.getAttribute("view-id");
+      return viewId ? window.google.picker.ViewId[viewId] : void 0;
+    }
+  };
+
+  // src/index.ts
+  customElements.define("drive-picker", DrivePickerElement);
+  customElements.define("drive-picker-docs-view", DrivePickerDocsViewElement);
+
+  var root = $__namespace.from_html(`<main><drive-picker></drive-picker></main>`, 2);
+
+  function App($$anchor) {
+  	// see https://svelte.dev/docs/svelte/v5-migration-guide#Event-changes
+  	function handler(e) {
+  		console.log(e);
+  	}
+
+  	var main = root();
+  	var drive_picker = $__namespace.child(main);
+
+  	$__namespace.set_custom_element_data(drive_picker, 'client-id', "675807958095-nsptdcn5qdb6pl44cge1c6ghact9t5q0.apps.googleusercontent.com");
+  	$__namespace.set_custom_element_data(drive_picker, 'app-id', "675807958095");
+  	$__namespace.set_custom_element_data(drive_picker, 'origin', "https://codesandbox.io");
+  	$__namespace.reset(main);
+  	$__namespace.event('picker:canceled', drive_picker, handler);
+  	$__namespace.event('picker:error', drive_picker, handler);
+  	$__namespace.event('picker:oauth:error', drive_picker, handler);
+  	$__namespace.event('picker:oauth:response', drive_picker, handler);
+  	$__namespace.event('picker:picked', drive_picker, handler);
+  	$__namespace.append($$anchor, main);
+  }
+
+  const app = new App({
+    target: document.body,
+  });
+
+  return app;
+
+})(null, null, $);
+//# sourceMappingURL=bundle.js.map

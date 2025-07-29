@@ -1,0 +1,11 @@
+---
+applications:
+  - name: drive-picker
+    # command: node app.js
+    command: python3 -m http.server
+    instances: 1
+    memory: 128M
+    default-route: true
+    buildpack: python_buildpack
+    env:
+      OPTIMIZE_MEMORY: "true"

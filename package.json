@@ -1,0 +1,23 @@
+{
+  "name": "svelte",
+  "version": "1.0.0",
+  "devDependencies": {
+    "rollup": "*",
+    "rollup-plugin-commonjs": "*",
+    "rollup-plugin-node-resolve": "*",
+    "rollup-plugin-svelte": "latest"
+  },
+  "dependencies": {
+    "@googleworkspace/drive-picker-element": "*",
+    "lodash": "4.17.21",
+    "svelte": "^5.37.1"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "keywords": [
+    "svelte",
+    "starter"
+  ],
+  "description": "Svelte example starter project"
+}
